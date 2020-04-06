@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Route, Redirect } from 'react-router-dom';
 
+import DefaultLayout from '~/pages/_layout/default';
+
 import { store } from '~/store';
 
 export default function RouteWrapper({
@@ -16,10 +18,23 @@ export default function RouteWrapper({
   }
 
   if (signed && !isPrivate) {
-    return <Redirect to="/delivery" />;
+    return <Redirect to="/deliveries" />;
   }
 
-  return <Route {...rest} component={Component} />;
+  if (!signed && !isPrivate) {
+    return <Route {...rest} render={(props) => <Component {...props} />} />;
+  }
+
+  return (
+    <Route
+      {...rest}
+      render={(props) => (
+        <DefaultLayout>
+          <Component {...props} />
+        </DefaultLayout>
+      )}
+    />
+  );
 }
 
 RouteWrapper.propTypes = {
