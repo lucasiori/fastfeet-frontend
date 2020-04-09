@@ -9,19 +9,24 @@ import {
   MenuItem,
 } from '~/pages/_layout/default/styles';
 
-export default function ActionsMenu({ hidden, onToggleVisibility, onDelete }) {
+export default function ActionsMenu({
+  hidden,
+  onToggleVisibility,
+  onEdit,
+  onDelete,
+}) {
   return (
     <MenuButton onClick={onToggleVisibility}>
       <FaEllipsisH size={16} color="#c6c6c6" />
 
       <MenuContent hidden={hidden ? 1 : 0}>
         <ul>
-          <MenuItem>
-            <MdEdit size={16} color="#4d85ee" />
+          <MenuItem onClick={onEdit}>
+            <MdEdit size={18} color="#4d85ee" />
             Editar
           </MenuItem>
           <MenuItem onClick={onDelete}>
-            <MdDeleteForever size={16} color="#de3b3b" />
+            <MdDeleteForever size={18} color="#de3b3b" />
             Excluir
           </MenuItem>
         </ul>
@@ -33,5 +38,6 @@ export default function ActionsMenu({ hidden, onToggleVisibility, onDelete }) {
 ActionsMenu.propTypes = {
   hidden: PropTypes.bool.isRequired,
   onToggleVisibility: PropTypes.func.isRequired,
+  onEdit: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
 };

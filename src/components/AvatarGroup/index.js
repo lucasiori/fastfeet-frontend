@@ -14,7 +14,9 @@ export default function AvatarGroup({ src, name, showFullName }) {
       const arrText = name.split(' ');
 
       setAvatarText(
-        `${arrText[0].charAt(0)}${arrText[1] ? arrText[1].charAt(0) : ''}`
+        `${arrText[0].charAt(0).toUpperCase()}${
+          arrText[1] ? arrText[1].charAt(0).toUpperCase() : ''
+        }`
       );
     }
 

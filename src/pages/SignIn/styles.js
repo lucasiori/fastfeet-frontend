@@ -25,7 +25,7 @@ export const Container = styled.div`
     margin-top: 25px;
 
     span {
-      color: #fb6f91;
+      color: #fb6f73;
       font-size: 12px;
       font-weight: bold;
       margin-top: 5px;

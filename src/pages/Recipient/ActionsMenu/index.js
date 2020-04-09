@@ -22,11 +22,11 @@ export default function ActionsMenu({
       <MenuContent hidden={hidden ? 1 : 0}>
         <ul>
           <MenuItem onClick={onEdit}>
-            <MdEdit size={16} color="#4d85ee" />
+            <MdEdit size={18} color="#4d85ee" />
             Editar
           </MenuItem>
           <MenuItem onClick={onDelete}>
-            <MdDeleteForever size={16} color="#de3b3b" />
+            <MdDeleteForever size={18} color="#de3b3b" />
             Excluir
           </MenuItem>
         </ul>

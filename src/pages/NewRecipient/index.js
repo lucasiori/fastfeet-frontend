@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Form, Input, Select } from '@rocketseat/unform';
+import { Form, Input } from '@rocketseat/unform';
 import * as Yup from 'yup';
 import { toast } from 'react-toastify';
 import arraySort from 'array-sort';
 import { IoIosArrowBack } from 'react-icons/io';
 import { FaCheck } from 'react-icons/fa';
 
+import ZipCodeInput from './ZipCodeInput';
+import StatesSelect from './StatesSelect';
+
 import api from '~/services/api';
 import history from '~/services/history';
-
-import ZipCodeInput from './ZipCodeInput';
 
 import {
   Container,
@@ -30,7 +31,8 @@ export default function NewRecipient() {
   const schema = Yup.object().shape({
     name: Yup.string().required('* Campo Obrigatório'),
     address: Yup.string().required('* Campo Obrigatório'),
-    number: Yup.string().required('* Campo Obrigatório'),
+    address_number: Yup.string().required('* Campo Obrigatório'),
+    complement: Yup.string(),
     city: Yup.string().required('* Campo Obrigatório'),
     state: Yup.string().required('* Campo Obrigatório'),
     zip_code: Yup.string().required('* Campo Obrigatório'),
@@ -38,19 +40,23 @@ export default function NewRecipient() {
 
   useEffect(() => {
     async function loadStates() {
-      const response = await api.get(
-        'https://servicodados.ibge.gov.br/api/v1/localidades/estados'
-      );
+      try {
+        const response = await api.get(
+          'https://servicodados.ibge.gov.br/api/v1/localidades/estados'
+        );
 
-      setStates(
-        arraySort(
-          response.data.map((s) => ({
-            id: s.nome,
-            title: s.nome,
-          })),
-          'title'
-        )
-      );
+        setStates(
+          arraySort(
+            response.data.map((s) => ({
+              value: s.nome,
+              label: s.nome,
+            })),
+            'label'
+          )
+        );
+      } catch (err) {
+        toast.error('Erro ao buscar estados');
+      }
     }
 
     loadStates();
@@ -63,7 +69,7 @@ export default function NewRecipient() {
 
         setRecipient(response.data);
       } catch (err) {
-        toast.error('Erro ao buscar destinatário');
+        toast.error(err.response.data.error || 'Erro ao buscar destinatário');
       }
     }
 
@@ -75,16 +81,19 @@ export default function NewRecipient() {
     }
   }, []);
 
-  function handleSubmit(data) {
+  async function handleSubmit(data) {
     async function storeRecipient() {
       try {
         await api.post('/recipients', data);
 
         setLoading(false);
+        toast.success('Destinatário cadastrado com sucesso');
         history.push('/recipients');
       } catch (err) {
         setLoading(false);
-        toast.error('Erro ao salvar destinatário');
+        toast.error(
+          err.response.data.error || 'Erro ao cadastrar destinatário'
+        );
       }
     }
 
@@ -93,10 +102,13 @@ export default function NewRecipient() {
         await api.put(`/recipients/${recipient.id}`, data);
 
         setLoading(false);
+        toast.success('Destinatário atualizado com sucesso');
         history.push('/recipients');
       } catch (err) {
         setLoading(false);
-        toast.error('Erro ao atualizar destinatário');
+        toast.error(
+          err.response.data.error || 'Erro ao atualizar destinatário'
+        );
       }
     }
 
@@ -113,7 +125,11 @@ export default function NewRecipient() {
     <Container>
       <Form schema={schema} initialData={recipient} onSubmit={handleSubmit}>
         <Header>
-          <h1>Cadastro de destinatário</h1>
+          <h1>
+            {recipient.id
+              ? 'Edição de destinatários'
+              : 'Cadastro de destinatários'}
+          </h1>
 
           <div>
             <Link to="/recipients">
@@ -142,9 +158,9 @@ export default function NewRecipient() {
               <Input id="address" name="address" />
             </FormGroup>
 
-            <FormGroup id="numberFormGroup">
-              <label htmlFor="number">Número</label>
-              <Input id="number" name="number" />
+            <FormGroup id="addressNumberFormGroup">
+              <label htmlFor="address_number">Número</label>
+              <Input id="address_number" name="address_number" />
             </FormGroup>
 
             <FormGroup id="complementFormGroup">
@@ -161,17 +177,20 @@ export default function NewRecipient() {
 
             <FormGroup id="stateFormGroup">
               <label htmlFor="state">Estado</label>
-              <Select
-                id="state"
-                name="state"
-                defaultValue={recipient ? recipient.state : undefined}
+
+              <StatesSelect
                 options={states}
+                defaultValue={recipient.state || undefined}
               />
             </FormGroup>
 
             <FormGroup id="zipCodeFormGroup">
               <label htmlFor="zip_code">CEP</label>
-              <ZipCodeInput />
+              <ZipCodeInput
+                defaultValue={
+                  recipient.id ? String(recipient.zip_code) : undefined
+                }
+              />
             </FormGroup>
           </FormContainer>
         </Content>

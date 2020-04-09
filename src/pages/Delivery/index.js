@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 import { confirmAlert } from 'react-confirm-alert';
-import { MdSearch, MdAdd } from 'react-icons/md';
+import {
+  MdSearch,
+  MdAdd,
+  MdCheckBoxOutlineBlank,
+  MdCheckBox,
+} from 'react-icons/md';
 import { AiOutlineLoading } from 'react-icons/ai';
 
 import AvatarGroup from '~/components/AvatarGroup';
@@ -12,11 +18,12 @@ import Details from './Details';
 import ActionsMenu from './ActionsMenu';
 
 import api from '~/services/api';
+import history from '~/services/history';
 
 import getDeliveryState from '~/utils/getDeliveryState';
 
-import { PageHeader, Button, Table } from '~/pages/_layout/default/styles';
-import { Content, Status } from './styles';
+import { Button, Table } from '~/pages/_layout/default/styles';
+import { DeliveryPageHeader, ProblemsFilter, Content, Status } from './styles';
 
 export default function Delivery() {
   const [loading, setLoading] = useState(true);
@@ -24,6 +31,7 @@ export default function Delivery() {
   const [itensAmount, setItensAmount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [filter, setFilter] = useState('');
+  const [problemsFilter, setProblemsFilter] = useState(false);
   const [visibleMenu, setVisibleMenu] = useState(undefined);
 
   useEffect(() => {
@@ -42,22 +50,28 @@ export default function Delivery() {
         setItensAmount(Number(response.headers['x-total-count']));
       } catch (err) {
         setLoading(false);
-        toast.error('Erro ao buscar encomendas');
+        toast.error(err.response.data.error || 'Erro ao buscar encomendas');
       }
     }
 
     loadDeliveries();
   }, []);
 
-  async function handlePagination(page) {
+  async function handleFilterDeliveries(page) {
     try {
       setLoading(true);
+      setCurrentPage(page || 1);
 
-      const params = { page };
+      const params = { page: page || 1 };
 
-      if (filter) params.q = filter;
+      if (filter) {
+        params.q = filter;
+      }
 
-      const response = await api.get('deliveries', { params });
+      const response = await api.get(
+        problemsFilter ? 'problems/deliveries' : 'deliveries',
+        { params }
+      );
 
       setDeliveries(
         response.data.map((delivery) => ({
@@ -67,44 +81,19 @@ export default function Delivery() {
       );
 
       setLoading(false);
-      setCurrentPage(page);
+
+      if (!page) {
+        setItensAmount(Number(response.headers['x-total-count']));
+      }
     } catch (err) {
       setLoading(false);
-      toast.error('Erro ao buscar encomendas');
+      toast.error(err.response.data.error || 'Erro ao buscar encomendas');
     }
   }
 
-  function handleFilter(keyCode) {
-    if (keyCode !== 13) return;
-
-    async function filterDeliveries() {
-      try {
-        setLoading(true);
-        setCurrentPage(1);
-
-        const params = { currentPage };
-
-        if (filter) params.q = filter;
-
-        const response = await api.get('deliveries', { params });
-
-        setDeliveries(
-          response.data.map((delivery) => ({
-            ...delivery,
-            state: getDeliveryState(delivery),
-          }))
-        );
-
-        setLoading(false);
-        setItensAmount(Number(response.headers['x-total-count']));
-      } catch (err) {
-        setLoading(false);
-        toast.error('Erro ao buscar encomendas');
-      }
-    }
-
-    filterDeliveries();
-  }
+  useEffect(() => {
+    handleFilterDeliveries();
+  }, [problemsFilter]); // eslint-disable-line
 
   function handleDelete(id) {
     async function deleteDelivery(closeAlert) {
@@ -118,7 +107,7 @@ export default function Delivery() {
 
         if (deliveries.length === 1) {
           if (currentPage > 1) {
-            handlePagination(currentPage - 1);
+            handleFilterDeliveries(currentPage - 1);
           } else {
             setLoading(false);
           }
@@ -128,7 +117,7 @@ export default function Delivery() {
         }
       } catch (err) {
         setLoading(false);
-        toast.error('Erro ao excluir encomenda');
+        toast.error(err.response.data.error || 'Erro ao excluir encomenda');
       }
     }
 
@@ -160,7 +149,7 @@ export default function Delivery() {
 
   return (
     <>
-      <PageHeader>
+      <DeliveryPageHeader>
         <h1>Gerenciando encomendas</h1>
 
         <div>
@@ -169,17 +158,35 @@ export default function Delivery() {
             placeholder="Buscar por encomendas"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            onKeyPress={(e) => handleFilter(e.which)}
+            onKeyPress={(e) => {
+              if (e.which === 13) handleFilterDeliveries();
+            }}
           />
 
           <MdSearch size={18} color="#999" />
 
-          <Button type="button">
-            <MdAdd size={18} color="#fff" />
-            Cadastrar
-          </Button>
+          <ProblemsFilter
+            active={problemsFilter}
+            onClick={() => setProblemsFilter(!problemsFilter)}
+          >
+            <Button type="button">
+              {problemsFilter ? (
+                <MdCheckBox size={18} color="#fff" />
+              ) : (
+                <MdCheckBoxOutlineBlank size={18} color="#fff" />
+              )}
+              Encomendas com problema
+            </Button>
+          </ProblemsFilter>
+
+          <Link to="/deliveries/new">
+            <Button type="button">
+              <MdAdd size={18} color="#fff" />
+              Cadastrar
+            </Button>
+          </Link>
         </div>
-      </PageHeader>
+      </DeliveryPageHeader>
 
       <Content>
         {loading ? (
@@ -224,9 +231,11 @@ export default function Delivery() {
                   </td>
                   <td>
                     <ActionsMenu
+                      delivery={delivery}
                       hidden={visibleMenu !== delivery.id}
                       onToggleVisibility={() => toggleActionsMenu(delivery.id)}
                       onDetails={() => showDeliveryDetails(delivery)}
+                      onEdit={() => history.push(`/deliveries/${delivery.id}`)}
                       onDelete={() => handleDelete(delivery.id)}
                     />
                   </td>
@@ -237,12 +246,14 @@ export default function Delivery() {
         )}
       </Content>
 
-      <Pagination
-        itensAmount={itensAmount}
-        currentPage={currentPage}
-        handlePaginationPrev={() => handlePagination(currentPage - 1)}
-        handlePaginationNext={() => handlePagination(currentPage + 1)}
-      />
+      {deliveries.length > 0 && (
+        <Pagination
+          itensAmount={itensAmount}
+          currentPage={currentPage}
+          handlePaginationPrev={() => handleFilterDeliveries(currentPage - 1)}
+          handlePaginationNext={() => handleFilterDeliveries(currentPage + 1)}
+        />
+      )}
     </>
   );
 }

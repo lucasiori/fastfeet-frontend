@@ -69,7 +69,7 @@ export default createGlobalStyle`
     cursor: pointer;
   }
 
-  /** Customize Scrollbar */
+  /** Custom Scrollbar */
   #root *::-webkit-scrollbar {
     width: 10px;
     height: 10px;
@@ -77,12 +77,11 @@ export default createGlobalStyle`
 
   #root *::-webkit-scrollbar-track {
     background: transparent;
-    box-shadow: inset 0 0 8px 0 #ccc;
     border-radius: 30px;
   }
 
   #root *::-webkit-scrollbar-thumb {
-    background: #7d40e7;
+    background: #ddd;
     border-radius: 30px;
   }
 
@@ -94,5 +93,27 @@ export default createGlobalStyle`
   .react-confirm-alert {
     width: 90%;
     max-width: 450px;
+  }
+
+  /** Custom Toastify */
+  .toast-container {
+    border-radius: 4px;
+    font-size: 16px;
+  }
+
+  .toast-container.Toastify__toast--error {
+    background: #fb6f73;
+  }
+
+  .toast-container.Toastify__toast--success {
+    background: #64ca67;
+  }
+
+  .toast-container button[aria-label="close"] {
+    opacity: 1;
+  }
+
+  .toast-progressbar {
+    background: #fff;
   }
 `;

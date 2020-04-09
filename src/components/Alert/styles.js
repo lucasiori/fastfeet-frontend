@@ -38,7 +38,7 @@ export const CancelButton = styled.button.attrs({
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fb6f91;
+  background: #fb6f73;
   color: #fff;
   font-weight: bold;
   text-transform: uppercase;
@@ -49,7 +49,7 @@ export const CancelButton = styled.button.attrs({
   transition: background 200ms;
 
   &:hover {
-    background: ${lighten(0.05, '#FB6F91')};
+    background: ${lighten(0.05, '#fb6f73')};
   }
 `;
 

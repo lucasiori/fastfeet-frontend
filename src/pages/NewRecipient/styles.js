@@ -120,7 +120,7 @@ export const FormGroup = styled.div`
     }
   }
 
-  &#numberFormGroup {
+  &#addressNumberFormGroup {
     width: 13%;
 
     @media screen and (max-width: 750px) {
@@ -155,7 +155,7 @@ export const FormGroup = styled.div`
   }
 
   span {
-    color: #fb6f91;
+    color: #fb6f73;
     font-size: 12px;
     font-weight: bold;
     margin-top: 5px;

@@ -15,9 +15,9 @@ export default function SignIn() {
 
   const schema = Yup.object().shape({
     email: Yup.string()
-      .email('Digite um email válido')
-      .required('Digite o email'),
-    password: Yup.string().required('Digite a senha'),
+      .email('Informe um email válido')
+      .required('* Campo obrigatório'),
+    password: Yup.string().required('* Campo obrigatório'),
   });
 
   function handleSubmit({ email, password }) {
@@ -32,22 +32,12 @@ export default function SignIn() {
         <Form schema={schema} onSubmit={handleSubmit}>
           <FormGroup>
             <label htmlFor="email">SEU E-MAIL</label>
-            <Input
-              type="email"
-              id="email"
-              name="email"
-              placeholder="exemplo@email.com"
-            />
+            <Input type="email" id="email" name="email" />
           </FormGroup>
 
           <FormGroup>
             <label htmlFor="password">SUA SENHA</label>
-            <Input
-              type="password"
-              id="password"
-              name="password"
-              placeholder="************"
-            />
+            <Input type="password" id="password" name="password" />
           </FormGroup>
 
           <SubmitButton type="submit" loading={loading ? 1 : 0}>

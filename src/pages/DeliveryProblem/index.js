@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { toast } from 'react-toastify';
 import { confirmAlert } from 'react-confirm-alert';
+import { toast } from 'react-toastify';
 import { AiOutlineLoading } from 'react-icons/ai';
 
 import Pagination from '~/components/Pagination';
@@ -32,28 +32,30 @@ export default function Recipient() {
         setItensAmount(Number(response.headers['x-total-count']));
       } catch (err) {
         setLoading(false);
-        toast.error('Erro ao buscar problemas na entrega');
+        toast.error(
+          err.response.data.error || 'Erro ao buscar problemas nas entregas'
+        );
       }
     }
 
     loadProblems();
   }, []);
 
-  async function handlePagination(page) {
+  async function handleFilterProblems(page) {
     try {
       setLoading(true);
+      setCurrentPage(page);
 
-      const response = await api.get('deliveries/problems', {
-        params: { page },
-      });
+      const response = await api.get('deliverymen', { page });
 
       setProblems(response.data);
 
       setLoading(false);
-      setCurrentPage(page);
     } catch (err) {
       setLoading(false);
-      toast.error('Erro ao buscar problemas na entrega');
+      toast.error(
+        err.response.data.error || 'Erro ao buscar problemas nas entregas'
+      );
     }
   }
 
@@ -79,7 +81,7 @@ export default function Recipient() {
         setLoading(false);
       } catch (err) {
         setLoading(false);
-        toast.error('Erro ao cancelar entrega');
+        toast.error(err.response.data.error || 'Erro ao cancelar entrega');
       }
     }
 
@@ -150,12 +152,14 @@ export default function Recipient() {
         )}
       </Content>
 
-      <Pagination
-        itensAmount={itensAmount}
-        currentPage={currentPage}
-        handlePaginationPrev={() => handlePagination(currentPage - 1)}
-        handlePaginationNext={() => handlePagination(currentPage + 1)}
-      />
+      {problems.length > 0 && (
+        <Pagination
+          itensAmount={itensAmount}
+          currentPage={currentPage}
+          handlePaginationPrev={() => handleFilterProblems(currentPage - 1)}
+          handlePaginationNext={() => handleFilterProblems(currentPage + 1)}
+        />
+      )}
     </>
   );
 }

@@ -23,8 +23,8 @@ export function* signInRequest({ payload }) {
 
     history.push('/deliveries');
   } catch (err) {
-    toast.error('Erro ao realizar o login, por favor verifique os dados');
     put(signInFailure());
+    toast.error(err.response.data.error || 'Erro ao realizar login');
   }
 }
 

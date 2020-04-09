@@ -293,13 +293,10 @@
   ],
   "deliverymen": [
     {
-      "id": 6,
+      "avatar_id": null,
       "name": "Entregador Teste 3",
       "email": "entregador.teste3@gmail.com",
-      "createdAt": "2020-03-31T00:11:21.766Z",
-      "updatedAt": "2020-03-31T00:11:21.766Z",
-      "avatar_id": null,
-      "avatar": null
+      "id": 6
     },
     {
       "id": 7,
@@ -313,16 +310,14 @@
   ],
   "recipients": [
     {
-      "id": 1,
-      "name": "Lucas Fernando Iori",
+      "name": "Lucas Fernando Iori1",
       "address": "rua Recife",
-      "number": "10",
+      "address_number": "10",
       "complement": "fundos",
-      "state": "SP",
       "city": "Itajobi",
-      "zip_code": 15840000,
-      "createdAt": "2020-03-01T18:51:47.630Z",
-      "updatedAt": "2020-03-01T18:51:47.630Z"
+      "state": "SP",
+      "zip_code": "15840-000",
+      "id": 1
     },
     {
       "id": 2,
@@ -378,7 +373,7 @@
       "number": "10",
       "complement": "fundos",
       "city": "Itajobi",
-      "state": "São Paulo",
+      "state": "Amazonas",
       "zip_code": "15840-000",
       "id": 6
     },
@@ -391,16 +386,6 @@
       "state": "São Paulo",
       "zip_code": "74854-000",
       "id": 7
-    },
-    {
-      "name": "Destinatário Teste",
-      "address": "rua do centro",
-      "number": "458/A",
-      "complement": "",
-      "city": "Itajobi",
-      "state": "São Paulo",
-      "zip_code": "15840-000",
-      "id": 8
     }
   ],
   "problems": [

@@ -24,13 +24,13 @@ export default function ActionsMenu({
       <MenuContent hidden={hidden ? 1 : 0}>
         <ul>
           <MenuItem onClick={onDetails}>
-            <IoMdEye size={16} color="#8e5be8" />
+            <IoMdEye size={18} color="#8e5be8" />
             Visualizar
           </MenuItem>
 
           {showCancelDeliveryButton && (
             <MenuItem onClick={onCancelDelivery}>
-              <MdDeleteForever size={16} color="#de3b3b" />
+              <MdDeleteForever size={18} color="#de3b3b" />
               Cancelar entrega
             </MenuItem>
           )}

@@ -12,6 +12,7 @@ import AvatarGroup from '~/components/AvatarGroup';
 import ActionsMenu from './ActionsMenu';
 
 import api from '~/services/api';
+import history from '~/services/history';
 
 import { PageHeader, Button, Table } from '~/pages/_layout/default/styles';
 import { Content } from './styles';
@@ -35,58 +36,37 @@ export default function Deliveryman() {
         setItensAmount(Number(response.headers['x-total-count']));
       } catch (err) {
         setLoading(false);
-        toast.error('Erro ao buscar entregadores');
+        toast.error(err.response.data.error || 'Erro ao buscar entregadores');
       }
     }
 
     loadDeliverymen();
   }, []);
 
-  async function handlePagination(page) {
+  async function handleFilterDeliverymen(page) {
     try {
       setLoading(true);
 
-      const params = { page };
+      const params = { page: page || 1 };
 
-      if (filter) params.q = filter;
+      if (filter) {
+        params.q = filter;
+      }
 
       const response = await api.get('deliverymen', { params });
 
       setDeliverymen(response.data);
 
       setLoading(false);
-      setCurrentPage(page);
+      setCurrentPage(page || 1);
+
+      if (!page) {
+        setItensAmount(Number(response.headers['x-total-count']));
+      }
     } catch (err) {
       setLoading(false);
-      toast.error('Erro ao buscar entregadores');
+      toast.error(err.response.data.error || 'Erro ao buscar entregadores');
     }
-  }
-
-  function handleFilter(keyCode) {
-    if (keyCode !== 13) return;
-
-    async function filterDeliverymen() {
-      try {
-        setLoading(true);
-        setCurrentPage(1);
-
-        const params = { currentPage };
-
-        if (filter) params.q = filter;
-
-        const response = await api.get('deliverymen', { params });
-
-        setDeliverymen(response.data);
-
-        setLoading(false);
-        setItensAmount(Number(response.headers['x-total-count']));
-      } catch (err) {
-        setLoading(false);
-        toast.error('Erro ao buscar entregadores');
-      }
-    }
-
-    filterDeliverymen();
   }
 
   function handleDelete(id) {
@@ -101,7 +81,7 @@ export default function Deliveryman() {
 
         if (deliverymen.length === 1) {
           if (currentPage > 1) {
-            handlePagination(currentPage - 1);
+            handleFilterDeliverymen(currentPage - 1);
           } else {
             setLoading(false);
           }
@@ -113,7 +93,7 @@ export default function Deliveryman() {
         }
       } catch (err) {
         setLoading(false);
-        toast.error('Erro ao excluir entregador');
+        toast.error(err.response.data.error || 'Erro ao excluir entregador');
       }
     }
 
@@ -148,7 +128,9 @@ export default function Deliveryman() {
             placeholder="Buscar por entregadores"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            onKeyPress={(e) => handleFilter(e.which)}
+            onKeyPress={(e) => {
+              if (e.which === 13) handleFilterDeliverymen();
+            }}
           />
 
           <MdSearch size={18} color="#999" />
@@ -197,6 +179,9 @@ export default function Deliveryman() {
                       onToggleVisibility={() =>
                         toggleActionsMenu(deliveryman.id)
                       }
+                      onEdit={() =>
+                        history.push(`/deliverymen/${deliveryman.id}`)
+                      }
                       onDelete={() => handleDelete(deliveryman.id)}
                     />
                   </td>
@@ -207,12 +192,14 @@ export default function Deliveryman() {
         )}
       </Content>
 
-      <Pagination
-        itensAmount={itensAmount}
-        currentPage={currentPage}
-        handlePaginationPrev={() => handlePagination(currentPage - 1)}
-        handlePaginationNext={() => handlePagination(currentPage + 1)}
-      />
+      {deliverymen.length > 0 && (
+        <Pagination
+          itensAmount={itensAmount}
+          currentPage={currentPage}
+          handlePaginationPrev={() => handleFilterDeliverymen(currentPage - 1)}
+          handlePaginationNext={() => handleFilterDeliverymen(currentPage + 1)}
+        />
+      )}
     </>
   );
 }

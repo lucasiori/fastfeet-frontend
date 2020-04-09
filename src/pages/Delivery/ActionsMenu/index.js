@@ -11,9 +11,11 @@ import {
 } from '~/pages/_layout/default/styles';
 
 export default function ActionsMenu({
+  delivery,
   hidden,
   onToggleVisibility,
   onDetails,
+  onEdit,
   onDelete,
 }) {
   return (
@@ -23,17 +25,25 @@ export default function ActionsMenu({
       <MenuContent hidden={hidden ? 1 : 0}>
         <ul>
           <MenuItem onClick={onDetails}>
-            <IoMdEye size={16} color="#8e5be8" />
+            <IoMdEye size={18} color="#8e5be8" />
             Visualizar
           </MenuItem>
-          <MenuItem>
-            <MdEdit size={16} color="#4d85ee" />
-            Editar
-          </MenuItem>
-          <MenuItem onClick={onDelete}>
-            <MdDeleteForever size={16} color="#de3b3b" />
-            Deletar
-          </MenuItem>
+
+          {!delivery.start_date && !delivery.canceled_at && (
+            <MenuItem onClick={onEdit}>
+              <MdEdit size={18} color="#4d85ee" />
+              Editar
+            </MenuItem>
+          )}
+
+          {(!delivery.start_date ||
+            (delivery.start_date && delivery.end_date) ||
+            delivery.canceled_at) && (
+            <MenuItem onClick={onDelete}>
+              <MdDeleteForever size={18} color="#de3b3b" />
+              Deletar
+            </MenuItem>
+          )}
         </ul>
       </MenuContent>
     </MenuButton>
@@ -41,8 +51,20 @@ export default function ActionsMenu({
 }
 
 ActionsMenu.propTypes = {
+  delivery: PropTypes.shape({
+    start_date: PropTypes.string,
+    end_date: PropTypes.string,
+    canceled_at: PropTypes.string,
+  }).isRequired,
   hidden: PropTypes.bool.isRequired,
   onToggleVisibility: PropTypes.func.isRequired,
-  onDetails: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
+  onDetails: PropTypes.func,
+  onEdit: PropTypes.func,
+  onDelete: PropTypes.func,
+};
+
+ActionsMenu.defaultProps = {
+  onDetails: () => {},
+  onEdit: () => {},
+  onDelete: () => {},
 };

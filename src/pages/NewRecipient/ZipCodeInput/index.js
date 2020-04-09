@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { Input, useField } from '@rocketseat/unform';
 import ReactInputMask from 'react-input-mask';
 
-export default function ZipCodeInput() {
-  const { defaultValue, registerField } = useField('zip_code');
+export default function ZipCodeInput({ defaultValue }) {
+  const { registerField } = useField('zip_code');
 
-  const [zipCode, setZipCode] = useState(defaultValue);
+  const [zipCode, setZipCode] = useState('');
 
   const ref = useRef();
 
@@ -19,6 +20,10 @@ export default function ZipCodeInput() {
     }
   }, [ref, registerField]);
 
+  useEffect(() => {
+    setZipCode(defaultValue);
+  }, [defaultValue]);
+
   return (
     <ReactInputMask
       mask="99999-999"
@@ -30,3 +35,11 @@ export default function ZipCodeInput() {
     </ReactInputMask>
   );
 }
+
+ZipCodeInput.propTypes = {
+  defaultValue: PropTypes.string,
+};
+
+ZipCodeInput.defaultProps = {
+  defaultValue: '',
+};

@@ -6,6 +6,8 @@ import { toast } from 'react-toastify';
 import { IoIosArrowBack } from 'react-icons/io';
 import { FaCheck } from 'react-icons/fa';
 
+import AvatarInput from './AvatarInput';
+
 import api from '~/services/api';
 import history from '~/services/history';
 
@@ -23,6 +25,7 @@ export default function NewDeliveryman() {
   const [loading, setLoading] = useState(false);
 
   const schema = Yup.object().shape({
+    avatar_id: Yup.string().nullable(),
     name: Yup.string().required('* Campo Obrigatório'),
     email: Yup.string()
       .email('Informe um email válido')
@@ -36,7 +39,7 @@ export default function NewDeliveryman() {
 
         setDeliveryman(response.data);
       } catch (err) {
-        toast.error('Erro ao buscar entregador');
+        toast.error(err.response.data.error || 'Erro ao buscar entregador');
       }
     }
 
@@ -54,22 +57,27 @@ export default function NewDeliveryman() {
         await api.post('/deliverymen', data);
 
         setLoading(false);
+        toast.success('Entregador cadastrado com sucesso');
         history.push('/deliverymen');
       } catch (err) {
         setLoading(false);
-        toast.error('Erro ao salvar entregador');
+        toast.error(err.response.data.error || 'Erro ao cadastrar entregador');
       }
     }
 
     async function updateDeliveryman() {
       try {
-        await api.put(`/deliverymen/${deliveryman.id}`, data);
+        await api.put(`/deliverymen/${deliveryman.id}`, {
+          ...data,
+          avatar_id: data.avatar_id || null,
+        });
 
         setLoading(false);
+        toast.success('Entregador atualizado com sucesso');
         history.push('/deliverymen');
       } catch (err) {
         setLoading(false);
-        toast.error('Erro ao atualizar entregador');
+        toast.error(err.response.data.error || 'Erro ao atualizar entregador');
       }
     }
 
@@ -86,7 +94,11 @@ export default function NewDeliveryman() {
     <Container>
       <Form schema={schema} initialData={deliveryman} onSubmit={handleSubmit}>
         <Header>
-          <h1>Cadastro de entregadores</h1>
+          <h1>
+            {deliveryman.id
+              ? 'Edição de entregadores'
+              : 'Cadastro de entregadores'}
+          </h1>
 
           <div>
             <Link to="/deliverymen">
@@ -104,6 +116,16 @@ export default function NewDeliveryman() {
         </Header>
 
         <Content>
+          <FormGroup>
+            <AvatarInput
+              defaultValue={
+                deliveryman.id
+                  ? { id: deliveryman.avatar_id, ...deliveryman.avatar }
+                  : undefined
+              }
+            />
+          </FormGroup>
+
           <FormGroup>
             <label htmlFor="name">Nome</label>
             <Input id="name" name="name" />

@@ -36,10 +36,7 @@ export const PageHeader = styled.header`
     > svg {
       position: absolute;
       left: 15px;
-
-      @media screen and (max-width: 450px) {
-        top: 10px;
-      }
+      top: 10px;
     }
 
     input {
@@ -101,6 +98,19 @@ export const Table = styled.table`
   tbody > tr {
     height: 57px;
     background: #fff;
+
+    &:last-child:not(:nth-child(1)) {
+      .table-actions-menu {
+        margin: 0 0 10px;
+        bottom: 100%;
+
+        &::before {
+          top: auto;
+          bottom: -10px;
+          transform: rotate(180deg);
+        }
+      }
+    }
   }
 
   td {
@@ -109,8 +119,8 @@ export const Table = styled.table`
     border-radius: 4px;
   }
 
-  td:last-child {
-    width: 1%;
+  th#actionsColumn {
+    width: 100px;
   }
 `;
 
@@ -122,16 +132,19 @@ export const MenuButton = styled.button`
   margin-left: 15px;
 `;
 
-export const MenuContent = styled.div`
+export const MenuContent = styled.div.attrs({
+  className: 'table-actions-menu',
+})`
   position: absolute;
   display: ${(props) => (props.hidden ? 'none' : 'block')};
-  width: 150px;
+  width: 155px;
   background: #fff;
+  border: 1px solid #eee;
   border-radius: 4px;
   padding: 8px 10px;
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.15);
   margin-top: 5px;
-  left: calc(50% - 75px);
+  left: calc(50% - 110px);
   z-index: 99;
 
   &::before {
@@ -145,7 +158,7 @@ export const MenuContent = styled.div`
     border-bottom: 10px solid #fff;
     filter: drop-shadow(0 -2px 2px rgba(0, 0, 0, 0.1));
     top: -10px;
-    left: calc(50% - 10px);
+    left: calc(50% + 25px);
   }
 
   ul {

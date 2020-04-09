@@ -2,7 +2,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { Router } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, Zoom } from 'react-toastify';
 
 import './config/ReactotronConfig';
 
@@ -21,7 +21,9 @@ function App() {
           <GlobalStyles />
           <ToastContainer
             autoClose={3000}
-            style={{ color: '#fff', fontWeight: 'bold' }}
+            transition={Zoom}
+            toastClassName="toast-container"
+            progressClassName="toast-progressbar"
           />
         </Router>
       </PersistGate>

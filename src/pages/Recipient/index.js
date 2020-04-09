@@ -35,58 +35,37 @@ export default function Recipient() {
         setItensAmount(Number(response.headers['x-total-count']));
       } catch (err) {
         setLoading(false);
-        toast.error('Erro ao buscar destinatários');
+        toast.error(err.response.data.error || 'Erro ao buscar destinatários');
       }
     }
 
     loadRecipients();
   }, []);
 
-  async function handlePagination(page) {
+  async function handleFilterRecipients(page) {
     try {
       setLoading(true);
+      setCurrentPage(page || 1);
 
-      const params = { page };
+      const params = { page: page || 1 };
 
-      if (filter) params.q = filter;
+      if (filter) {
+        params.q = filter;
+      }
 
       const response = await api.get('recipients', { params });
 
       setRecipients(response.data);
 
       setLoading(false);
-      setCurrentPage(page);
+
+      if (!page) {
+        setItensAmount(Number(response.headers['x-total-count']));
+      }
     } catch (err) {
       setLoading(false);
-      toast.error('Erro ao buscar destinatários');
+      toast.error(err.response.data.error || 'Erro ao buscar destinatários');
     }
-  }
-
-  function handleFilter(keyCode) {
-    if (keyCode !== 13) return;
-
-    async function filterRecipients() {
-      try {
-        setLoading(true);
-        setCurrentPage(1);
-
-        const params = { currentPage };
-
-        if (filter) params.q = filter;
-
-        const response = await api.get('recipients', { params });
-
-        setRecipients(response.data);
-
-        setLoading(false);
-        setItensAmount(Number(response.headers['x-total-count']));
-      } catch (err) {
-        setLoading(false);
-        toast.error('Erro ao buscar destinatários');
-      }
-    }
-
-    filterRecipients();
   }
 
   function handleDelete(id) {
@@ -101,7 +80,7 @@ export default function Recipient() {
 
         if (recipients.length === 1) {
           if (currentPage > 1) {
-            handlePagination(currentPage - 1);
+            handleFilterRecipients(currentPage - 1);
           } else {
             setLoading(false);
           }
@@ -111,7 +90,7 @@ export default function Recipient() {
         }
       } catch (err) {
         setLoading(false);
-        toast.error('Erro ao excluir destinatário');
+        toast.error(err.response.data.error || 'Erro ao excluir destinatário');
       }
     }
 
@@ -146,7 +125,9 @@ export default function Recipient() {
             placeholder="Buscar por destinatários"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            onKeyPress={(e) => handleFilter(e.which)}
+            onKeyPress={(e) => {
+              if (e.which === 13) handleFilterRecipients();
+            }}
           />
 
           <MdSearch size={18} color="#999" />
@@ -178,7 +159,7 @@ export default function Recipient() {
                 <tr key={recipient.id}>
                   <td>#{recipient.id}</td>
                   <td>{recipient.name}</td>
-                  <td>{`${recipient.address}, ${recipient.number}, ${recipient.city} - ${recipient.state}`}</td>
+                  <td>{`${recipient.address}, ${recipient.address_number}, ${recipient.city} - ${recipient.state}`}</td>
                   <td>
                     <ActionsMenu
                       hidden={visibleMenu !== recipient.id}
@@ -194,12 +175,14 @@ export default function Recipient() {
         )}
       </Content>
 
-      <Pagination
-        itensAmount={itensAmount}
-        currentPage={currentPage}
-        handlePaginationPrev={() => handlePagination(currentPage - 1)}
-        handlePaginationNext={() => handlePagination(currentPage + 1)}
-      />
+      {recipients.length > 0 && (
+        <Pagination
+          itensAmount={itensAmount}
+          currentPage={currentPage}
+          handlePaginationPrev={() => handleFilterRecipients(currentPage - 1)}
+          handlePaginationNext={() => handleFilterRecipients(currentPage + 1)}
+        />
+      )}
     </>
   );
 }
