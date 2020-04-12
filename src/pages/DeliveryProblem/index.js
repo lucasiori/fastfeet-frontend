@@ -1,30 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { confirmAlert } from 'react-confirm-alert';
 import { toast } from 'react-toastify';
-import { AiOutlineLoading } from 'react-icons/ai';
 
 import Pagination from '~/components/Pagination';
 import Alert from '~/components/Alert';
+import Loading from '~/components/Loading';
 import ActionsMenu from './ActionsMenu';
 import Details from './Details';
 
 import api from '~/services/api';
 
-import { PageHeader, Table } from '~/pages/_layout/default/styles';
-import { Content } from './styles';
+import { PageContent } from './styles';
 
 export default function Recipient() {
   const [loading, setLoading] = useState(true);
   const [problems, setProblems] = useState([]);
   const [itensAmount, setItensAmount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [visibleMenu, setVisibleMenu] = useState({});
+  const [visibleMenu, setVisibleMenu] = useState(undefined);
 
   useEffect(() => {
     async function loadProblems() {
       try {
-        const response = await api.get('problems');
+        const response = await api.get('/problems');
 
         setProblems(response.data);
 
@@ -33,7 +31,9 @@ export default function Recipient() {
       } catch (err) {
         setLoading(false);
         toast.error(
-          err.response.data.error || 'Erro ao buscar problemas nas entregas'
+          err.response
+            ? err.response.data.error
+            : 'Erro ao buscar problemas nas entregas'
         );
       }
     }
@@ -54,7 +54,9 @@ export default function Recipient() {
     } catch (err) {
       setLoading(false);
       toast.error(
-        err.response.data.error || 'Erro ao buscar problemas nas entregas'
+        err.response
+          ? err.response.data.error
+          : 'Erro ao buscar problemas nas entregas'
       );
     }
   }
@@ -68,37 +70,35 @@ export default function Recipient() {
         await api.delete(`/problems/${id}/cancel-delivery`);
 
         setProblems(
-          problems.map((problem) => ({
-            ...problem,
-            delivery: {
-              id: problem.delivery.id,
-              canceled_at:
-                problem.id === id ? new Date() : problem.delivery.canceled_at,
-            },
-          }))
+          problems.map((problem) =>
+            problem.delivery_id === id
+              ? {
+                  ...problem,
+                  delivery: { ...problem.delivery, cancelable: false },
+                }
+              : problem
+          )
         );
 
         setLoading(false);
       } catch (err) {
         setLoading(false);
-        toast.error(err.response.data.error || 'Erro ao cancelar entrega');
+        toast.error(
+          err.response ? err.response.data.error : 'Erro ao cancelar entrega'
+        );
       }
     }
 
-    const customUI = ({ onClose }) => (
-      <Alert
-        title="Atenção"
-        message="Deseja realmente cancelar a entrega?"
-        onCancel={onClose}
-        onConfirm={() => cancelDelivery(onClose)}
-      />
-    );
-
-    customUI.propTypes = {
-      onClose: PropTypes.func.isRequired,
-    };
-
-    confirmAlert({ customUI });
+    confirmAlert({
+      customUI: (props) => (
+        <Alert
+          {...props}
+          title="Atenção"
+          message="Deseja realmente cancelar a entrega?"
+          onConfirm={cancelDelivery}
+        />
+      ),
+    });
   }
 
   function toggleActionsMenu(id) {
@@ -113,15 +113,15 @@ export default function Recipient() {
 
   return (
     <>
-      <PageHeader>
+      <header>
         <h1>Problemas na entrega</h1>
-      </PageHeader>
+      </header>
 
-      <Content>
+      <PageContent>
         {loading ? (
-          <AiOutlineLoading size={100} color="#7159c1" />
+          <Loading />
         ) : (
-          <Table>
+          <table>
             <thead>
               <tr>
                 <th id="deliveryColumn">Encomenda</th>
@@ -136,21 +136,19 @@ export default function Recipient() {
                   <td className="limited-content">{problem.description}</td>
                   <td>
                     <ActionsMenu
+                      problem={problem}
                       hidden={visibleMenu !== problem.id}
                       onToggleVisibility={() => toggleActionsMenu(problem.id)}
                       onDetails={() => showProblemDetails(problem)}
-                      showCancelDeliveryButton={
-                        problem.delivery.canceled_at === null
-                      }
                       onCancelDelivery={() => handleCancelDelivery(problem.id)}
                     />
                   </td>
                 </tr>
               ))}
             </tbody>
-          </Table>
+          </table>
         )}
-      </Content>
+      </PageContent>
 
       {problems.length > 0 && (
         <Pagination

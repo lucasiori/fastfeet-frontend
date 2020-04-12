@@ -6,8 +6,14 @@ import { signOut } from '~/store/modules/auth/actions';
 
 import history from '~/services/history';
 
-import { MenuContent } from '~/pages/_layout/default/styles';
-import { Container, Content, BurguerMenu, NavLink, Logout } from './styles';
+import { Content } from '~/components/ActionsMenu';
+import {
+  Container,
+  HeaderContent,
+  BurguerMenu,
+  NavLink,
+  Logout,
+} from './styles';
 
 import logo from '~/assets/logo.png';
 
@@ -40,7 +46,7 @@ export default function Header() {
 
   return (
     <Container>
-      <Content>
+      <HeaderContent>
         <nav>
           <img src={logo} alt="FastFeet" width={150} />
 
@@ -49,7 +55,7 @@ export default function Header() {
           >
             <GiHamburgerMenu size={25} color="#7d40e7" />
 
-            <MenuContent hidden={burguerMenuVisible ? 0 : 1}>
+            <Content hidden={burguerMenuVisible ? 0 : 1}>
               <ul>
                 {pages.map((page) => (
                   <li key={page.path}>
@@ -63,7 +69,7 @@ export default function Header() {
                   </li>
                 ))}
               </ul>
-            </MenuContent>
+            </Content>
           </BurguerMenu>
 
           <ul>
@@ -85,7 +91,7 @@ export default function Header() {
           <strong>{profile.name}</strong>
           <Logout onClick={handleSignOut}>sair do sistema</Logout>
         </aside>
-      </Content>
+      </HeaderContent>
     </Container>
   );
 }

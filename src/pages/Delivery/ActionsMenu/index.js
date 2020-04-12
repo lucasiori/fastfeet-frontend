@@ -4,11 +4,7 @@ import { MdEdit, MdDeleteForever } from 'react-icons/md';
 import { FaEllipsisH } from 'react-icons/fa';
 import { IoMdEye } from 'react-icons/io';
 
-import {
-  MenuButton,
-  MenuContent,
-  MenuItem,
-} from '~/pages/_layout/default/styles';
+import { Button, Content, Item } from '~/components/ActionsMenu';
 
 export default function ActionsMenu({
   delivery,
@@ -19,52 +15,48 @@ export default function ActionsMenu({
   onDelete,
 }) {
   return (
-    <MenuButton onClick={onToggleVisibility}>
+    <Button onClick={onToggleVisibility}>
       <FaEllipsisH size={16} color="#c6c6c6" />
 
-      <MenuContent hidden={hidden ? 1 : 0}>
+      <Content hidden={hidden ? 1 : 0}>
         <ul>
-          <MenuItem onClick={onDetails}>
+          <Item onClick={onDetails}>
             <IoMdEye size={18} color="#8e5be8" />
             Visualizar
-          </MenuItem>
+          </Item>
 
-          {!delivery.start_date && !delivery.canceled_at && (
-            <MenuItem onClick={onEdit}>
+          {delivery.editable && (
+            <Item onClick={onEdit}>
               <MdEdit size={18} color="#4d85ee" />
               Editar
-            </MenuItem>
+            </Item>
           )}
 
-          {(!delivery.start_date ||
-            (delivery.start_date && delivery.end_date) ||
-            delivery.canceled_at) && (
-            <MenuItem onClick={onDelete}>
+          {delivery.deletable && (
+            <Item onClick={onDelete}>
               <MdDeleteForever size={18} color="#de3b3b" />
               Deletar
-            </MenuItem>
+            </Item>
           )}
         </ul>
-      </MenuContent>
-    </MenuButton>
+      </Content>
+    </Button>
   );
 }
 
 ActionsMenu.propTypes = {
   delivery: PropTypes.shape({
-    start_date: PropTypes.string,
-    end_date: PropTypes.string,
-    canceled_at: PropTypes.string,
+    editable: PropTypes.bool,
+    deletable: PropTypes.bool,
   }).isRequired,
   hidden: PropTypes.bool.isRequired,
   onToggleVisibility: PropTypes.func.isRequired,
-  onDetails: PropTypes.func,
+  onDetails: PropTypes.func.isRequired,
   onEdit: PropTypes.func,
   onDelete: PropTypes.func,
 };
 
 ActionsMenu.defaultProps = {
-  onDetails: () => {},
   onEdit: () => {},
   onDelete: () => {},
 };

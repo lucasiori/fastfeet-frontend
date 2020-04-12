@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { Form, Input } from '@rocketseat/unform';
 import * as Yup from 'yup';
 import { toast } from 'react-toastify';
 import arraySort from 'array-sort';
-import { IoIosArrowBack } from 'react-icons/io';
 import { FaCheck } from 'react-icons/fa';
 
+import { BackButton } from '../../components/Button';
 import ZipCodeInput from './ZipCodeInput';
 import StatesSelect from './StatesSelect';
 
@@ -15,10 +14,9 @@ import history from '~/services/history';
 
 import {
   Container,
-  Header,
-  BackButton,
+  PageHeader,
   SubmitButton,
-  Content,
+  PageContent,
   FormContainer,
   FormGroup,
 } from './styles';
@@ -69,7 +67,9 @@ export default function NewRecipient() {
 
         setRecipient(response.data);
       } catch (err) {
-        toast.error(err.response.data.error || 'Erro ao buscar destinatário');
+        toast.error(
+          err.response ? err.response.data.error : 'Erro ao buscar destinatário'
+        );
       }
     }
 
@@ -92,7 +92,9 @@ export default function NewRecipient() {
       } catch (err) {
         setLoading(false);
         toast.error(
-          err.response.data.error || 'Erro ao cadastrar destinatário'
+          err.response
+            ? err.response.data.error
+            : 'Erro ao cadastrar destinatário'
         );
       }
     }
@@ -107,7 +109,9 @@ export default function NewRecipient() {
       } catch (err) {
         setLoading(false);
         toast.error(
-          err.response.data.error || 'Erro ao atualizar destinatário'
+          err.response
+            ? err.response.data.error
+            : 'Erro ao atualizar destinatário'
         );
       }
     }
@@ -124,29 +128,20 @@ export default function NewRecipient() {
   return (
     <Container>
       <Form schema={schema} initialData={recipient} onSubmit={handleSubmit}>
-        <Header>
-          <h1>
-            {recipient.id
-              ? 'Edição de destinatários'
-              : 'Cadastro de destinatários'}
-          </h1>
+        <PageHeader>
+          <h1>{`${recipient.id ? 'Edição' : 'Cadastro'} de destinatários`}</h1>
 
           <div>
-            <Link to="/recipients">
-              <BackButton>
-                <IoIosArrowBack size={18} color="#fff" />
-                VOLTAR
-              </BackButton>
-            </Link>
+            <BackButton url="/recipients" />
 
             <SubmitButton disabled={loading ? 1 : 0}>
               <FaCheck size={18} color="#fff" />
               SALVAR
             </SubmitButton>
           </div>
-        </Header>
+        </PageHeader>
 
-        <Content>
+        <PageContent>
           <FormGroup>
             <label htmlFor="name">Nome</label>
             <Input id="name" name="name" />
@@ -193,7 +188,7 @@ export default function NewRecipient() {
               />
             </FormGroup>
           </FormContainer>
-        </Content>
+        </PageContent>
       </Form>
     </Container>
   );

@@ -1,21 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 import { confirmAlert } from 'react-confirm-alert';
-import { MdSearch, MdAdd } from 'react-icons/md';
-import { AiOutlineLoading } from 'react-icons/ai';
 
 import Pagination from '~/components/Pagination';
 import Alert from '~/components/Alert';
 import AvatarGroup from '~/components/AvatarGroup';
+import SearchInput from '~/components/SearchInput';
+import { AddButton } from '~/components/Button';
+import Loading from '~/components/Loading';
 import ActionsMenu from './ActionsMenu';
 
 import api from '~/services/api';
 import history from '~/services/history';
 
-import { PageHeader, Button, Table } from '~/pages/_layout/default/styles';
-import { Content } from './styles';
+import { PageHeader, PageContent } from './styles';
 
 export default function Deliveryman() {
   const [loading, setLoading] = useState(true);
@@ -23,7 +21,7 @@ export default function Deliveryman() {
   const [itensAmount, setItensAmount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [filter, setFilter] = useState('');
-  const [visibleMenu, setVisibleMenu] = useState({});
+  const [visibleMenu, setVisibleMenu] = useState(undefined);
 
   useEffect(() => {
     async function loadDeliverymen() {
@@ -36,7 +34,9 @@ export default function Deliveryman() {
         setItensAmount(Number(response.headers['x-total-count']));
       } catch (err) {
         setLoading(false);
-        toast.error(err.response.data.error || 'Erro ao buscar entregadores');
+        toast.error(
+          err.response ? err.response.data.error : 'Erro ao buscar entregadores'
+        );
       }
     }
 
@@ -46,26 +46,23 @@ export default function Deliveryman() {
   async function handleFilterDeliverymen(page) {
     try {
       setLoading(true);
+      setCurrentPage(page || 1);
 
-      const params = { page: page || 1 };
-
-      if (filter) {
-        params.q = filter;
-      }
+      const params = { page: page || 1, q: filter };
 
       const response = await api.get('deliverymen', { params });
 
       setDeliverymen(response.data);
-
       setLoading(false);
-      setCurrentPage(page || 1);
 
       if (!page) {
         setItensAmount(Number(response.headers['x-total-count']));
       }
     } catch (err) {
       setLoading(false);
-      toast.error(err.response.data.error || 'Erro ao buscar entregadores');
+      toast.error(
+        err.response ? err.response.data.error : 'Erro ao buscar entregadores'
+      );
     }
   }
 
@@ -91,26 +88,32 @@ export default function Deliveryman() {
           );
           setLoading(false);
         }
+
+        toast.success('Entregador excluído com sucesso');
       } catch (err) {
         setLoading(false);
-        toast.error(err.response.data.error || 'Erro ao excluir entregador');
+        toast.error(
+          err.response ? err.response.data.error : 'Erro ao excluir entregador'
+        );
       }
     }
 
-    const customUI = ({ onClose }) => (
-      <Alert
-        title="Atenção"
-        message="Deseja realmente excluir o entregador?"
-        onCancel={onClose}
-        onConfirm={() => deleteDeliveryman(onClose)}
-      />
-    );
+    confirmAlert({
+      customUI: (props) => (
+        <Alert
+          {...props}
+          title="Atenção"
+          message="Deseja realmente excluir o entregador?"
+          onConfirm={deleteDeliveryman}
+        />
+      ),
+    });
+  }
 
-    customUI.propTypes = {
-      onClose: PropTypes.func.isRequired,
-    };
-
-    confirmAlert({ customUI });
+  function handleKeyPress(keyCode) {
+    if (keyCode === 13) {
+      handleFilterDeliverymen();
+    }
   }
 
   function toggleActionsMenu(id) {
@@ -123,32 +126,22 @@ export default function Deliveryman() {
         <h1>Gerenciando entregadores</h1>
 
         <div>
-          <input
-            name="search"
+          <SearchInput
             placeholder="Buscar por entregadores"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.which === 13) handleFilterDeliverymen();
-            }}
+            onKeyPress={(e) => handleKeyPress(e.which)}
           />
 
-          <MdSearch size={18} color="#999" />
-
-          <Link to="/deliverymen/new">
-            <Button type="button">
-              <MdAdd size={18} color="#fff" />
-              Cadastrar
-            </Button>
-          </Link>
+          <AddButton url="/deliverymen/new" />
         </div>
       </PageHeader>
 
-      <Content>
+      <PageContent>
         {loading ? (
-          <AiOutlineLoading size={100} color="#7159c1" />
+          <Loading />
         ) : (
-          <Table>
+          <table>
             <thead>
               <tr>
                 <th id="idColumn">ID</th>
@@ -188,9 +181,9 @@ export default function Deliveryman() {
                 </tr>
               ))}
             </tbody>
-          </Table>
+          </table>
         )}
-      </Content>
+      </PageContent>
 
       {deliverymen.length > 0 && (
         <Pagination

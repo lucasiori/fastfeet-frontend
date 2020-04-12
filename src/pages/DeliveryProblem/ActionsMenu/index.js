@@ -4,51 +4,50 @@ import { MdDeleteForever } from 'react-icons/md';
 import { FaEllipsisH } from 'react-icons/fa';
 import { IoMdEye } from 'react-icons/io';
 
-import {
-  MenuButton,
-  MenuContent,
-  MenuItem,
-} from '~/pages/_layout/default/styles';
+import { Button, Content, Item } from '~/components/ActionsMenu';
 
 export default function ActionsMenu({
+  problem,
   hidden,
   onToggleVisibility,
   onDetails,
-  showCancelDeliveryButton,
   onCancelDelivery,
 }) {
   return (
-    <MenuButton onClick={onToggleVisibility}>
+    <Button onClick={onToggleVisibility}>
       <FaEllipsisH size={16} color="#c6c6c6" />
 
-      <MenuContent hidden={hidden ? 1 : 0}>
+      <Content hidden={hidden ? 1 : 0}>
         <ul>
-          <MenuItem onClick={onDetails}>
+          <Item onClick={onDetails}>
             <IoMdEye size={18} color="#8e5be8" />
             Visualizar
-          </MenuItem>
+          </Item>
 
-          {showCancelDeliveryButton && (
-            <MenuItem onClick={onCancelDelivery}>
+          {problem.delivery.cancelable && (
+            <Item onClick={onCancelDelivery}>
               <MdDeleteForever size={18} color="#de3b3b" />
               Cancelar entrega
-            </MenuItem>
+            </Item>
           )}
         </ul>
-      </MenuContent>
-    </MenuButton>
+      </Content>
+    </Button>
   );
 }
 
 ActionsMenu.propTypes = {
+  problem: PropTypes.shape({
+    delivery: PropTypes.shape({
+      cancelable: PropTypes.bool.isRequired,
+    }).isRequired,
+  }).isRequired,
   hidden: PropTypes.bool.isRequired,
   onToggleVisibility: PropTypes.func.isRequired,
   onDetails: PropTypes.func.isRequired,
-  showCancelDeliveryButton: PropTypes.bool,
   onCancelDelivery: PropTypes.func,
 };
 
 ActionsMenu.defaultProps = {
-  showCancelDeliveryButton: true,
   onCancelDelivery: () => {},
 };

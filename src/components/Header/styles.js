@@ -7,7 +7,7 @@ export const Container = styled.div`
   border-bottom: 1px solid #ddd;
 `;
 
-export const Content = styled.div`
+export const HeaderContent = styled.div`
   width: 90%;
   max-width: 1360px;
   display: flex;
@@ -72,6 +72,10 @@ export const BurguerMenu = styled.button`
   align-items: center;
   background: transparent;
   border: none;
+
+  &:hover {
+    background: transparent;
+  }
 
   @media screen and (min-width: 921px) {
     display: none;

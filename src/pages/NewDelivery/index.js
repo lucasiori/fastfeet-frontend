@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { Form, Input } from '@rocketseat/unform';
 import * as Yup from 'yup';
 import { toast } from 'react-toastify';
-import { IoIosArrowBack } from 'react-icons/io';
 import { FaCheck } from 'react-icons/fa';
 
+import { BackButton } from '../../components/Button';
 import RecipientsSelect from './RecipientsSelect';
 import DeliverymenSelect from './DeliverymenSelect';
 
@@ -14,10 +13,9 @@ import history from '~/services/history';
 
 import {
   Container,
-  Header,
-  BackButton,
+  PageHeader,
   SubmitButton,
-  Content,
+  PageContent,
   FormContainer,
   FormGroup,
 } from './styles';
@@ -39,7 +37,9 @@ export default function NewRecipient() {
 
         setDelivery(response.data);
       } catch (err) {
-        toast.error(err.response.data.error || 'Erro ao buscar entrega');
+        toast.error(
+          err.response ? err.response.data.error : 'Erro ao buscar entrega'
+        );
       }
     }
 
@@ -61,7 +61,9 @@ export default function NewRecipient() {
         history.push('/deliveries');
       } catch (err) {
         setLoading(false);
-        toast.error(err.response.data.error || 'Erro ao cadastradar entrega');
+        toast.error(
+          err.response ? err.response.data.error : 'Erro ao cadastradar entrega'
+        );
       }
     }
 
@@ -90,27 +92,20 @@ export default function NewRecipient() {
   return (
     <Container>
       <Form schema={schema} initialData={delivery} onSubmit={handleSubmit}>
-        <Header>
-          <h1>
-            {delivery.id ? 'Edição de encomendas' : 'Cadastro de encomendas'}
-          </h1>
+        <PageHeader>
+          <h1>{`${delivery.id ? 'Edição' : 'Cadastro'} de entregas`}</h1>
 
           <div>
-            <Link to="/deliveries">
-              <BackButton>
-                <IoIosArrowBack size={18} color="#fff" />
-                VOLTAR
-              </BackButton>
-            </Link>
+            <BackButton url="/deliveries" />
 
             <SubmitButton disabled={loading ? 1 : 0}>
               <FaCheck size={18} color="#fff" />
               SALVAR
             </SubmitButton>
           </div>
-        </Header>
+        </PageHeader>
 
-        <Content>
+        <PageContent>
           <FormContainer>
             <FormGroup id="recipientFormGroup">
               <label htmlFor="recipient">Destinatário</label>
@@ -145,7 +140,7 @@ export default function NewRecipient() {
             <label htmlFor="product">Nome do Produto</label>
             <Input id="product" name="product" />
           </FormGroup>
-        </Content>
+        </PageContent>
       </Form>
     </Container>
   );

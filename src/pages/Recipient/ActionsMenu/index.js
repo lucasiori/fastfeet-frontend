@@ -3,11 +3,7 @@ import PropTypes from 'prop-types';
 import { MdEdit, MdDeleteForever } from 'react-icons/md';
 import { FaEllipsisH } from 'react-icons/fa';
 
-import {
-  MenuButton,
-  MenuContent,
-  MenuItem,
-} from '~/pages/_layout/default/styles';
+import { Button, Content, Item } from '~/components/ActionsMenu';
 
 export default function ActionsMenu({
   hidden,
@@ -16,22 +12,22 @@ export default function ActionsMenu({
   onDelete,
 }) {
   return (
-    <MenuButton onClick={onToggleVisibility}>
+    <Button onClick={onToggleVisibility}>
       <FaEllipsisH size={16} color="#c6c6c6" />
 
-      <MenuContent hidden={hidden ? 1 : 0}>
+      <Content hidden={hidden ? 1 : 0}>
         <ul>
-          <MenuItem onClick={onEdit}>
+          <Item onClick={onEdit}>
             <MdEdit size={18} color="#4d85ee" />
             Editar
-          </MenuItem>
-          <MenuItem onClick={onDelete}>
+          </Item>
+          <Item onClick={onDelete}>
             <MdDeleteForever size={18} color="#de3b3b" />
             Excluir
-          </MenuItem>
+          </Item>
         </ul>
-      </MenuContent>
-    </MenuButton>
+      </Content>
+    </Button>
   );
 }
 

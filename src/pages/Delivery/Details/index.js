@@ -3,12 +3,15 @@ import PropTypes from 'prop-types';
 import { parseISO, format } from 'date-fns';
 import pt from 'date-fns/locale/pt';
 
+import DeliveryStatus from '../DeliveryStatus';
+
 import { formatZipCode } from '~/utils/format';
 
-import { Status } from '../styles';
 import { Container } from './styles';
 
 export default function Details({ delivery }) {
+  const { recipient } = delivery;
+
   return (
     <Container>
       <h3>Informações da encomenda</h3>
@@ -16,12 +19,7 @@ export default function Details({ delivery }) {
       <div>
         <strong>Status</strong>
         <span>
-          <Status
-            color={delivery.state.labelColor}
-            background={delivery.state.background}
-          >
-            {delivery.state.description}
-          </Status>
+          <DeliveryStatus status={delivery.status} />
         </span>
       </div>
 
@@ -33,12 +31,12 @@ export default function Details({ delivery }) {
       <div>
         <strong>Endereço de entrega</strong>
         <span>
-          {delivery.recipient.address}, {delivery.recipient.address_number}
+          {recipient.address}, {recipient.address_number}
         </span>
         <span>
-          {delivery.recipient.city} - {delivery.recipient.state}
+          {recipient.city} - {recipient.state}
         </span>
-        <span>{formatZipCode(delivery.recipient.zip_code)}</span>
+        <span>{formatZipCode(recipient.zip_code)}</span>
       </div>
 
       {(delivery.start_date || delivery.end_date || delivery.canceled_at) && (
@@ -109,10 +107,6 @@ Details.propTypes = {
     start_date: PropTypes.string,
     canceled_at: PropTypes.string,
     signature_id: PropTypes.number,
-    state: PropTypes.shape({
-      labelColor: PropTypes.string,
-      background: PropTypes.string,
-      description: PropTypes.string,
-    }),
+    status: PropTypes.string,
   }).isRequired,
 };

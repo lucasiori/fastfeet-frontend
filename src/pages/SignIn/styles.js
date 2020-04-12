@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { lighten } from 'polished';
 
 export const Wrapper = styled.div`
   height: 100%;
@@ -52,24 +51,6 @@ export const SubmitButton = styled.button.attrs((props) => ({
 }))`
   width: 100%;
   height: 45px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #7d40e7;
-  color: #fff;
-  font-weight: bold;
-  border: none;
-  border-radius: 4px;
   padding: 10px;
   margin: 15px auto 0;
-  transition: background 200ms;
-
-  &[disabled] {
-    background: #ccc;
-    cursor: not-allowed;
-  }
-
-  &:hover {
-    background: ${lighten(0.05, '#7d40e7')};
-  }
 `;

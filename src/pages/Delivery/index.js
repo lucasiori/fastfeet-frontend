@@ -1,29 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 import { confirmAlert } from 'react-confirm-alert';
-import {
-  MdSearch,
-  MdAdd,
-  MdCheckBoxOutlineBlank,
-  MdCheckBox,
-} from 'react-icons/md';
-import { AiOutlineLoading } from 'react-icons/ai';
+import { MdCheckBoxOutlineBlank, MdCheckBox } from 'react-icons/md';
 
 import AvatarGroup from '~/components/AvatarGroup';
+import DeliveryStatus from './DeliveryStatus';
 import Pagination from '~/components/Pagination';
 import Alert from '~/components/Alert';
+import SearchInput from '~/components/SearchInput';
+import { AddButton } from '~/components/Button';
+import Loading from '~/components/Loading';
 import Details from './Details';
 import ActionsMenu from './ActionsMenu';
 
 import api from '~/services/api';
 import history from '~/services/history';
 
-import getDeliveryState from '~/utils/getDeliveryState';
-
-import { Button, Table } from '~/pages/_layout/default/styles';
-import { DeliveryPageHeader, ProblemsFilter, Content, Status } from './styles';
+import { PageHeader, ProblemsFilter, Button, PageContent } from './styles';
 
 export default function Delivery() {
   const [loading, setLoading] = useState(true);
@@ -39,18 +32,15 @@ export default function Delivery() {
       try {
         const response = await api.get('deliveries');
 
-        setDeliveries(
-          response.data.map((delivery) => ({
-            ...delivery,
-            state: getDeliveryState(delivery),
-          }))
-        );
+        setDeliveries(response.data);
 
         setLoading(false);
         setItensAmount(Number(response.headers['x-total-count']));
       } catch (err) {
         setLoading(false);
-        toast.error(err.response.data.error || 'Erro ao buscar encomendas');
+        toast.error(
+          err.response ? err.response.data.error : 'Erro ao buscar encomendas'
+        );
       }
     }
 
@@ -62,24 +52,12 @@ export default function Delivery() {
       setLoading(true);
       setCurrentPage(page || 1);
 
-      const params = { page: page || 1 };
+      const params = { page: page || 1, q: filter };
 
-      if (filter) {
-        params.q = filter;
-      }
+      const url = problemsFilter ? 'problems/deliveries' : 'deliveries';
+      const response = await api.get(url, { params });
 
-      const response = await api.get(
-        problemsFilter ? 'problems/deliveries' : 'deliveries',
-        { params }
-      );
-
-      setDeliveries(
-        response.data.map((delivery) => ({
-          ...delivery,
-          state: getDeliveryState(delivery),
-        }))
-      );
-
+      setDeliveries(response.data);
       setLoading(false);
 
       if (!page) {
@@ -87,7 +65,9 @@ export default function Delivery() {
       }
     } catch (err) {
       setLoading(false);
-      toast.error(err.response.data.error || 'Erro ao buscar encomendas');
+      toast.error(
+        err.response ? err.response.data.error : 'Erro ao buscar encomendas'
+      );
     }
   }
 
@@ -115,30 +95,36 @@ export default function Delivery() {
           setDeliveries(deliveries.filter((delivery) => delivery.id !== id));
           setLoading(false);
         }
+
+        toast.success('Entregada excluída com sucesso');
       } catch (err) {
         setLoading(false);
-        toast.error(err.response.data.error || 'Erro ao excluir encomenda');
+        toast.error(
+          err.response ? err.response.data.error : 'Erro ao excluir encomenda'
+        );
       }
     }
 
-    const customUI = ({ onClose }) => (
-      <Alert
-        title="Atenção"
-        message="Deseja realmente excluir a encomenda?"
-        onCancel={onClose}
-        onConfirm={() => deleteDelivery(onClose)}
-      />
-    );
-
-    customUI.propTypes = {
-      onClose: PropTypes.func.isRequired,
-    };
-
-    confirmAlert({ customUI });
+    confirmAlert({
+      customUI: (props) => (
+        <Alert
+          {...props}
+          title="Atenção"
+          message="Deseja realmente excluir a encomenda?"
+          onConfirm={deleteDelivery}
+        />
+      ),
+    });
   }
 
   function toggleActionsMenu(id) {
     setVisibleMenu(id !== visibleMenu ? id : undefined);
+  }
+
+  function handleKeyPress(keyCode) {
+    if (keyCode === 13) {
+      handleFilterDeliveries();
+    }
   }
 
   function showDeliveryDetails(delivery) {
@@ -149,21 +135,16 @@ export default function Delivery() {
 
   return (
     <>
-      <DeliveryPageHeader>
+      <PageHeader>
         <h1>Gerenciando encomendas</h1>
 
         <div>
-          <input
-            name="search"
+          <SearchInput
             placeholder="Buscar por encomendas"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.which === 13) handleFilterDeliveries();
-            }}
+            onKeyPress={(e) => handleKeyPress(e.which)}
           />
-
-          <MdSearch size={18} color="#999" />
 
           <ProblemsFilter
             active={problemsFilter}
@@ -179,20 +160,15 @@ export default function Delivery() {
             </Button>
           </ProblemsFilter>
 
-          <Link to="/deliveries/new">
-            <Button type="button">
-              <MdAdd size={18} color="#fff" />
-              Cadastrar
-            </Button>
-          </Link>
+          <AddButton url="/deliveries/new" />
         </div>
-      </DeliveryPageHeader>
+      </PageHeader>
 
-      <Content>
+      <PageContent>
         {loading ? (
-          <AiOutlineLoading size={100} color="#7159c1" />
+          <Loading />
         ) : (
-          <Table>
+          <table>
             <thead>
               <tr>
                 <th id="idColumn">ID</th>
@@ -222,12 +198,7 @@ export default function Delivery() {
                   <td>{delivery.recipient.city}</td>
                   <td>{delivery.recipient.state}</td>
                   <td>
-                    <Status
-                      color={delivery.state.labelColor}
-                      background={delivery.state.background}
-                    >
-                      {delivery.state.description}
-                    </Status>
+                    <DeliveryStatus status={delivery.status} />
                   </td>
                   <td>
                     <ActionsMenu
@@ -242,9 +213,9 @@ export default function Delivery() {
                 </tr>
               ))}
             </tbody>
-          </Table>
+          </table>
         )}
-      </Content>
+      </PageContent>
 
       {deliveries.length > 0 && (
         <Pagination

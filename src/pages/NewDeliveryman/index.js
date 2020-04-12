@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { IoIosArrowBack } from 'react-icons/io';
 import { FaCheck } from 'react-icons/fa';
 
+import { BackButton } from '../../components/Button';
 import AvatarInput from './AvatarInput';
 
 import api from '~/services/api';
@@ -13,10 +14,9 @@ import history from '~/services/history';
 
 import {
   Container,
-  Header,
-  BackButton,
+  PageHeader,
   SubmitButton,
-  Content,
+  PageContent,
   FormGroup,
 } from './styles';
 
@@ -39,7 +39,9 @@ export default function NewDeliveryman() {
 
         setDeliveryman(response.data);
       } catch (err) {
-        toast.error(err.response.data.error || 'Erro ao buscar entregador');
+        toast.error(
+          err.response ? err.response.data.error : 'Erro ao buscar entregador'
+        );
       }
     }
 
@@ -61,7 +63,11 @@ export default function NewDeliveryman() {
         history.push('/deliverymen');
       } catch (err) {
         setLoading(false);
-        toast.error(err.response.data.error || 'Erro ao cadastrar entregador');
+        toast.error(
+          err.response
+            ? err.response.data.error
+            : 'Erro ao cadastrar entregador'
+        );
       }
     }
 
@@ -77,7 +83,11 @@ export default function NewDeliveryman() {
         history.push('/deliverymen');
       } catch (err) {
         setLoading(false);
-        toast.error(err.response.data.error || 'Erro ao atualizar entregador');
+        toast.error(
+          err.response
+            ? err.response.data.error
+            : 'Erro ao atualizar entregador'
+        );
       }
     }
 
@@ -93,12 +103,8 @@ export default function NewDeliveryman() {
   return (
     <Container>
       <Form schema={schema} initialData={deliveryman} onSubmit={handleSubmit}>
-        <Header>
-          <h1>
-            {deliveryman.id
-              ? 'Edição de entregadores'
-              : 'Cadastro de entregadores'}
-          </h1>
+        <PageHeader>
+          <h1>{`${deliveryman.id ? 'Edição' : 'Cadastro'} de entregadores`}</h1>
 
           <div>
             <Link to="/deliverymen">
@@ -113,9 +119,9 @@ export default function NewDeliveryman() {
               SALVAR
             </SubmitButton>
           </div>
-        </Header>
+        </PageHeader>
 
-        <Content>
+        <PageContent>
           <FormGroup>
             <AvatarInput
               defaultValue={
@@ -135,7 +141,7 @@ export default function NewDeliveryman() {
             <label htmlFor="email">Email</label>
             <Input id="email" name="email" type="email" />
           </FormGroup>
-        </Content>
+        </PageContent>
       </Form>
     </Container>
   );

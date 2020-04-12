@@ -1,4 +1,5 @@
 import { createGlobalStyle } from 'styled-components';
+import { lighten } from 'polished';
 
 import 'react-toastify/dist/ReactToastify.css';
 import 'react-confirm-alert/src/react-confirm-alert.css';
@@ -66,7 +67,73 @@ export default createGlobalStyle`
   }
 
   button {
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #7d40e7;
+    color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 4px;
+    transition: background 200ms;
     cursor: pointer;
+
+    &[disabled] {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    &:not([disabled]):hover {
+      background: ${lighten(0.05, '#7d40e7')};
+    }
+  }
+
+  table {
+    width: 100%;
+    font-size: 16px;
+    border-spacing: 0 20px;
+    text-align: left;
+
+    th {
+      color: #444;
+      padding: 0 15px;
+    }
+
+    tbody > tr {
+      height: 57px;
+      background: #fff;
+
+      &:last-child:not(:nth-child(1)) {
+        .table-actions-menu {
+          margin: 0 0 10px;
+          bottom: 100%;
+
+          &::before {
+            top: auto;
+            bottom: -10px;
+            transform: rotate(180deg);
+          }
+        }
+      }
+    }
+
+    td {
+      color: #666;
+      padding: 10px 15px;
+      border-radius: 4px;
+    }
+
+    th#actionsColumn {
+      width: 100px;
+    }
+  }
+
+  h1 {
+    font-weight: bold;
+    font-size: 24px;
+    color: #444;
   }
 
   /** Custom Scrollbar */
@@ -111,6 +178,10 @@ export default createGlobalStyle`
 
   .toast-container button[aria-label="close"] {
     opacity: 1;
+
+    &:hover {
+      background: transparent;
+    }
   }
 
   .toast-progressbar {

@@ -1,24 +1,8 @@
 import styled from 'styled-components';
 
-export const Content = styled.section`
+export const PageContent = styled.section`
   margin-top: 30px;
   overflow: auto;
-
-  @keyframes loading {
-    to {
-      transform: rotate(0deg);
-    }
-
-    from {
-      transform: rotate(360deg);
-    }
-  }
-
-  > svg {
-    display: block;
-    margin: 50px auto;
-    animation: loading 1s linear infinite;
-  }
 
   table {
     table-layout: fixed;

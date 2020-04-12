@@ -1,20 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 import { confirmAlert } from 'react-confirm-alert';
-import { MdSearch, MdAdd } from 'react-icons/md';
-import { AiOutlineLoading } from 'react-icons/ai';
 
-import Pagination from '~/components/Pagination';
 import Alert from '~/components/Alert';
+import Pagination from '~/components/Pagination';
+import SearchInput from '~/components/SearchInput';
+import { AddButton } from '~/components/Button';
+import Loading from '~/components/Loading';
 import ActionsMenu from './ActionsMenu';
 
 import api from '~/services/api';
 import history from '~/services/history';
 
-import { PageHeader, Button, Table } from '~/pages/_layout/default/styles';
-import { Content } from './styles';
+import { PageHeader, PageContent } from './styles';
 
 export default function Recipient() {
   const [loading, setLoading] = useState(true);
@@ -22,7 +20,7 @@ export default function Recipient() {
   const [itensAmount, setItensAmount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [filter, setFilter] = useState('');
-  const [visibleMenu, setVisibleMenu] = useState({});
+  const [visibleMenu, setVisibleMenu] = useState(undefined);
 
   useEffect(() => {
     async function loadRecipients() {
@@ -35,7 +33,11 @@ export default function Recipient() {
         setItensAmount(Number(response.headers['x-total-count']));
       } catch (err) {
         setLoading(false);
-        toast.error(err.response.data.error || 'Erro ao buscar destinatários');
+        toast.error(
+          err.response
+            ? err.response.data.error
+            : 'Erro ao buscar destinatários'
+        );
       }
     }
 
@@ -47,16 +49,11 @@ export default function Recipient() {
       setLoading(true);
       setCurrentPage(page || 1);
 
-      const params = { page: page || 1 };
-
-      if (filter) {
-        params.q = filter;
-      }
+      const params = { page: page || 1, q: filter };
 
       const response = await api.get('recipients', { params });
 
       setRecipients(response.data);
-
       setLoading(false);
 
       if (!page) {
@@ -64,7 +61,9 @@ export default function Recipient() {
       }
     } catch (err) {
       setLoading(false);
-      toast.error(err.response.data.error || 'Erro ao buscar destinatários');
+      toast.error(
+        err.response ? err.response.data.error : 'Erro ao buscar destinatários'
+      );
     }
   }
 
@@ -88,26 +87,34 @@ export default function Recipient() {
           setRecipients(recipients.filter((recipient) => recipient.id !== id));
           setLoading(false);
         }
+
+        toast.success('Destinatário excluído com sucesso');
       } catch (err) {
         setLoading(false);
-        toast.error(err.response.data.error || 'Erro ao excluir destinatário');
+        toast.error(
+          err.response
+            ? err.response.data.error
+            : 'Erro ao excluir destinatário'
+        );
       }
     }
 
-    const customUI = ({ onClose }) => (
-      <Alert
-        title="Atenção"
-        message="Deseja realmente excluir o destinatário?"
-        onCancel={onClose}
-        onConfirm={() => deleteRecipient(onClose)}
-      />
-    );
+    confirmAlert({
+      customUI: (props) => (
+        <Alert
+          {...props}
+          title="Atenção"
+          message="Deseja realmente excluir o destinatário?"
+          onConfirm={deleteRecipient}
+        />
+      ),
+    });
+  }
 
-    customUI.propTypes = {
-      onClose: PropTypes.func.isRequired,
-    };
-
-    confirmAlert({ customUI });
+  function handleKeyPress(keyCode) {
+    if (keyCode === 13) {
+      handleFilterRecipients();
+    }
   }
 
   function toggleActionsMenu(id) {
@@ -120,32 +127,22 @@ export default function Recipient() {
         <h1>Gerenciando destinatários</h1>
 
         <div>
-          <input
-            name="search"
+          <SearchInput
             placeholder="Buscar por destinatários"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.which === 13) handleFilterRecipients();
-            }}
+            onKeyPress={(e) => handleKeyPress(e.which)}
           />
 
-          <MdSearch size={18} color="#999" />
-
-          <Link to="/recipients/new">
-            <Button type="button">
-              <MdAdd size={18} color="#fff" />
-              Cadastrar
-            </Button>
-          </Link>
+          <AddButton url="/recipients/new" />
         </div>
       </PageHeader>
 
-      <Content>
+      <PageContent>
         {loading ? (
-          <AiOutlineLoading size={100} color="#7159c1" />
+          <Loading />
         ) : (
-          <Table>
+          <table>
             <thead>
               <tr>
                 <th id="idColumn">ID</th>
@@ -171,9 +168,9 @@ export default function Recipient() {
                 </tr>
               ))}
             </tbody>
-          </Table>
+          </table>
         )}
-      </Content>
+      </PageContent>
 
       {recipients.length > 0 && (
         <Pagination
