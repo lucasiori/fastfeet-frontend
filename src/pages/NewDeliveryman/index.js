@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { Form, Input } from '@rocketseat/unform';
 import * as Yup from 'yup';
 import { toast } from 'react-toastify';
-import { IoIosArrowBack } from 'react-icons/io';
 import { FaCheck } from 'react-icons/fa';
 
 import { BackButton } from '../../components/Button';
@@ -107,12 +105,7 @@ export default function NewDeliveryman() {
           <h1>{`${deliveryman.id ? 'Edição' : 'Cadastro'} de entregadores`}</h1>
 
           <div>
-            <Link to="/deliverymen">
-              <BackButton>
-                <IoIosArrowBack size={18} color="#fff" />
-                VOLTAR
-              </BackButton>
-            </Link>
+            <BackButton url="/deliverymen" />
 
             <SubmitButton disabled={loading ? 1 : 0}>
               <FaCheck size={18} color="#fff" />

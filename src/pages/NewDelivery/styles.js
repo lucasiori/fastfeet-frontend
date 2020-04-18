@@ -71,40 +71,18 @@ export const FormGroup = styled.div`
   justify-content: center;
   margin-top: 15px;
 
-  &#addressFormGroup {
-    width: 60%;
+  &#recipientFormGroup {
+    width: 48%;
 
     @media screen and (max-width: 750px) {
       width: 100%;
     }
   }
 
-  &#numberFormGroup {
-    width: 13%;
+  &#deliverymanFormGroup {
+    width: 48%;
 
     @media screen and (max-width: 750px) {
-      width: 30%;
-    }
-  }
-
-  &#complementFormGroup {
-    width: 23%;
-
-    @media screen and (max-width: 750px) {
-      width: 66%;
-    }
-  }
-
-  &#cityFormGroup,
-  &#stateFormGroup,
-  &#zipCodeFormGroup {
-    width: 32%;
-  }
-
-  @media screen and (max-width: 600px) {
-    &#cityFormGroup,
-    &#stateFormGroup,
-    &#zipCodeFormGroup {
       width: 100%;
     }
   }

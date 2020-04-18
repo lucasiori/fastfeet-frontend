@@ -53,6 +53,7 @@ export const HeaderContent = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: center;
+    text-align: right;
 
     @media screen and (max-width: 420px) {
       margin-top: 15px;
@@ -73,7 +74,8 @@ export const BurguerMenu = styled.button`
   background: transparent;
   border: none;
 
-  &:hover {
+  &:hover,
+  &:active {
     background: transparent;
   }
 

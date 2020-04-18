@@ -93,7 +93,7 @@ export default function NewRecipient() {
     <Container>
       <Form schema={schema} initialData={delivery} onSubmit={handleSubmit}>
         <PageHeader>
-          <h1>{`${delivery.id ? 'Edição' : 'Cadastro'} de entregas`}</h1>
+          <h1>{`${delivery.id ? 'Edição' : 'Cadastro'} de encomendas`}</h1>
 
           <div>
             <BackButton url="/deliveries" />

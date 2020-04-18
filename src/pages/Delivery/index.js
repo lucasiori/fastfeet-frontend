@@ -30,7 +30,7 @@ export default function Delivery() {
   useEffect(() => {
     async function loadDeliveries() {
       try {
-        const response = await api.get('deliveries');
+        const response = await api.get('deliveries?status=all');
 
         setDeliveries(response.data);
 
@@ -54,7 +54,9 @@ export default function Delivery() {
 
       const params = { page: page || 1, q: filter };
 
-      const url = problemsFilter ? 'problems/deliveries' : 'deliveries';
+      const url = problemsFilter
+        ? 'problems/deliveries'
+        : 'deliveries?status=all';
       const response = await api.get(url, { params });
 
       setDeliveries(response.data);
