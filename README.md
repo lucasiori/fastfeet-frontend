@@ -15,7 +15,7 @@
 <br />
 
 <h2 id="sobre-aplicacao">ℹ Sobre a aplicação</h2>
-<pA aplicação trata-se de um sistema de gerenciamento para transportadoras.</p>
+<p>A aplicação trata-se de um sistema de gerenciamento para transportadoras.</p>
 <p>Na plataforma web, são cadastrados os entregadores, destinatário e encomendas. Também são listadas todas as encomendas cadastradas
 e você pode consultar os detalhes, como produto, status e se a entrega teve/possui algum problema.</p>
 <p>No aplicativo mobile, o usuário pode consultar o status da entrega e cadastrar problemas para a mesma, além de finalizar a entrega enviando uma foto da assinatura do destinatário</p>
