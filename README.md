@@ -20,6 +20,7 @@
 e você pode consultar os detalhes, como produto, status e se a entrega teve/possui algum problema.</p>
 <p>No aplicativo mobile, o usuário pode consultar o status da entrega e cadastrar problemas para a mesma, além de finalizar a entrega enviando uma foto da assinatura do destinatário</p>
 <p>⚙ Backend: <a href="https://github.com/lucasiori/fastfeet-backend">FastFeet - Backend</a></p>
+<p>📱 Mobile: <a href="https://github.com/lucasiori/fastfeet-mobile">FastFeet - Mobile</a></p>
 <p>
   <h3>💻 Frontend</h3>
   <p>A aplicação web é de uso exclusivo da transportadora, para todo o gerenciamento dos dados. Possui as seguintes funções:</p>
@@ -44,7 +45,7 @@ e você pode consultar os detalhes, como produto, status e se a entrega teve/pos
 <p><code>npm install</code></p>
 <p>Com todas as depedências instaladas, execute o comando para iniciar a aplicação:</p>
 <p><code>npm start</code></p>
-<p>A aplicação será executada na porta 3000 do seu localhost.</p>
+<p>A aplicação será executada na porta 3000.</p>
 
 <br />
 
